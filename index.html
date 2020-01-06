@@ -34,35 +34,81 @@
     <script>
       //目标效果--画线
       var canvas = document.getElementById("canvas");
+      //第一步：设置画布宽高与屏幕宽高相等
       //通过id找到canvas
       //canvas.width = document.body.clientWidth; //设置画布宽度与document.body宽度相等
       //canvas.height = document.body.clientHeight; //设置画布高度与document.body高度相等，但body的宽高不会占满屏幕，所以此代码无效
       canvas.width = document.documentElement.clientWidth;
       canvas.height = document.documentElement.clientHeight;
       var ctx = canvas.getContext("2d");
-
+      ctx.fillStyle = "black"; //填充
+      ctx.strokeStyle = "black"; //描边
+      ctx.lineWidth = 4;
+      ctx.lineCap = "round";
       let painting = false;
+      let last;
 
-      ctx.fillStyle = "black"; //填充样式
-      ctx.strokeStyle = "none";
-      canvas.onmousedown = () => {
+      //第四步：让线段从离散状态变得更加连续平滑
+      function drawLine(x1, y1, x2, y2) {
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      }
+
+      //--------以上是第四步--------
+
+      //第三步：手机端--------以下为手机端代码--------
+      var isTouchDevice = "ontouchstart" in document.documentElement;
+      //console.log(isTouchDevice);用console.log测试,切换为手机时为true，切换为电脑时为false
+      if (isTouchDevice) {
+        canvas.ontouchstart = e => {
+          let x = e.touches[0].clientX;
+          let y = e.touches[0].clientY;
+          last = [x, y];
+        };
+
+        canvas.ontouchmove = e => {
+          let x = e.touches[0].clientX;
+          let y = e.touches[0].clientY;
+          drawLine(last[0], last[1], x, y);
+          last = [x, y];
+          //--------以下为离散方式画线代码--------
+          //ctx.beginPath();
+          //ctx.arc(x, y, 10, 0, 2 * Math.PI); //这里不能用“e.clientX, e.clientY,”只能用“x，y”，因为“x，y”表示多个触碰点的坐标集合
+          //ctx.stroke();
+          //ctx.fill();
+        };
+      } else {
+      }
+      //--------以上为手机端代码--------
+
+      //第二步：pc端--------以下为pc端代码---------
+      canvas.onmousedown = e => {
         painting = true;
+        last = [e.clientX, e.clientY];
       };
       //如何理解canvas.onmousedown = (e)？浏览器会调用canvas.onmousemove,canvas.onmousemove(e=事件相关信息,e只是一个符号，取任意符号都可以)
       canvas.onmousemove = e => {
         if (painting === true) {
+          //--------以下为离散方式画线代码--------
           //ctx.fillRect(e.clientX - 5, e.clientY - 5, 10, 10); //填充矩形，将矩形注释掉，替换为圆形代码
-          ctx.beginPath();
-          ctx.arc(e.clientX, e.clientY, 10, 0, 2 * Math.PI); //五个参数经实验，依次表示，圆心x坐标，圆心y坐标，圆半径，弧度起始角度和最终角度。
-          ctx.stroke();
-          ctx.fill();
-        } else {
-          console.log("什么都不做");
+          //ctx.beginPath();
+          //ctx.arc(e.clientX, e.clientY, 4, 0, 2 * Math.PI); //五个参数经实验，依次表示，圆心x坐标，圆心y坐标，圆半径，弧度起始角度和最终角度。
+          //ctx.stroke();
+          //ctx.fill();
+          drawLine(last[0], last[1], e.clientX, e.clientY);
+          last = [e.clientX, e.clientY];
         }
+        //else {
+        //console.log("什么都不做");
+        //}
       };
       canvas.onmouseup = () => {
         painting = false;
       };
+
+      //--------以上为pc端代码---------
     </script>
   </body>
 </html>
