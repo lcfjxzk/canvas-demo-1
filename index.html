@@ -5,8 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>画板</title>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <h1>周凤的大屁股真大</h1>
+    <!--//因为使用div写出的代码性能低下，所以放弃使用div
+    <div id="canvas"></div>
+    <script>
+      canvas.onmousemove = e => {
+      console.log(e.clientX);
+      console.log(e.clientY); //console.log调试大法
+      let div = document.createElement("div"); //让文档创建一个标签
+      div.style.position = "absolute";      //让div的内链样式的position属性是‘absolute’
+      div.style.left = e.clientX + "px";
+      div.style.top = e.clientY + "px";
+      div.style.width = "6px";
+      div.style.height = "6px";
+      div.style.marginLeft = "-3px";
+      div.style.marginTop = "-3px";
+      div.style.borderRadius = "50%";
+      div.style.backgroundColor = "black";
+      canvas.appendChild(div); //将div添加到canvas里面
+      };
+      
+    </script>
+    //因为使用div写出的代码性能底下，所以放弃使用div,用canvas-->
+    <canvas id="canvas" width="100" height="100"></canvas>
+    <!--canvas的宽高必须设置与屏幕一致，否则出现图像模糊，用JS去获取屏幕宽高-->
+    <script>
+      //目标效果--画线
+      var canvas = document.getElementById("canvas");
+      //通过id找到canvas
+      //canvas.width = document.body.clientWidth; //设置画布宽度与document.body宽度相等
+      //canvas.height = document.body.clientHeight; //设置画布高度与document.body高度相等，但body的宽高不会占满屏幕，所以此代码无效
+      canvas.width = document.documentElement.clientWidth;
+      canvas.height = document.documentElement.clientHeight;
+      var ctx = canvas.getContext("2d");
+
+      let painting = false;
+
+      ctx.fillStyle = "black"; //填充样式
+      ctx.strokeStyle = "none";
+      canvas.onmousedown = () => {
+        painting = true;
+      };
+      //如何理解canvas.onmousedown = (e)？浏览器会调用canvas.onmousemove,canvas.onmousemove(e=事件相关信息,e只是一个符号，取任意符号都可以)
+      canvas.onmousemove = e => {
+        if (painting === true) {
+          //ctx.fillRect(e.clientX - 5, e.clientY - 5, 10, 10); //填充矩形，将矩形注释掉，替换为圆形代码
+          ctx.beginPath();
+          ctx.arc(e.clientX, e.clientY, 10, 0, 2 * Math.PI); //五个参数经实验，依次表示，圆心x坐标，圆心y坐标，圆半径，弧度起始角度和最终角度。
+          ctx.stroke();
+          ctx.fill();
+        } else {
+          console.log("什么都不做");
+        }
+      };
+      canvas.onmouseup = () => {
+        painting = false;
+      };
+    </script>
   </body>
 </html>
